@@ -1,0 +1,113 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>UniqueValueRenderer</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.22/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.22/esri/css/esri.css">
+    <script src="https://js.arcgis.com/3.22/"></script>
+    
+    <style type="text/css">
+        .MapClass{
+            width:100%;
+            height:600px;
+            border:1px solid #000;
+        }
+    </style>
+    <script type="text/javascript">
+        // @formatter:off
+        require([
+                    "esri/map",
+                    "esri/layers/ArcGISDynamicMapServiceLayer",
+                    "esri/layers/FeatureLayer",
+                    "esri/symbols/SimpleFillSymbol",
+                    "esri/symbols/SimpleLineSymbol",
+                    "esri/symbols/SimpleMarkerSymbol",
+                    "esri/Color",
+                    "esri/renderers/SimpleRenderer",
+                    "esri/renderers/ClassBreaksRenderer",
+                    "esri/layers/LayerDrawingOptions",
+                    "dojo/ready",
+                    "dojo/parser",
+                    "dojo/on",
+                    "dojo/dom",
+                    "dojo/_base/declare",
+                    "dojo/_base/array",
+                    "dijit/layout/BorderContainer",
+                    "dijit/layout/ContentPane",
+                    "dijit/form/Button"],
+                function (Map, ArcGISDynamicMapServiceLayer, FeatureLayer,
+                          SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Color,
+                          SimpleRenderer, ClassBreaksRenderer, LayerDrawingOptions,
+                          ready, parser, on, dom,
+                          declare, array,
+                          BorderContainer, ContentPane, Button) {
+
+                    // Wait until DOM is ready *and* all outstanding require() calls have been resolved
+                    ready(function () {
+                        // Parse DOM nodes decorated with the data-dojo-type attribute
+                        parser.parse();
+                        // URL variables
+                        var sUrlService="http://123.206.254.127:6080/arcgis/rest/services/hebi_pre_shape_1016/MapServer";
+
+                        // Create the map
+                        var mapMain = new Map("MyMapDiv");
+                        // Construct the USA layer
+                        var sUrl = new ArcGISDynamicMapServiceLayer(sUrlService, {
+                            opacity: 0.8
+                        });
+
+                  	  var myInfoTemplate = new esri.InfoTemplate("${FID}", "${*}");
+                      //定义一个要素图层
+                      var featureLayer = new FeatureLayer(
+                      "http://123.206.254.127:6080/arcgis/rest/services/hebi_pre_shape_1016/MapServer/3",
+                       {
+                          mode:FeatureLayer.MODE_SNAPSHOT,
+                          outFields: ["*"],
+                          infoTemplate: myInfoTemplate,
+                          opacity: 0
+                       });
+                      mapMain.addLayer(featureLayer);                      
+                      mapMain.addLayer(sUrl);
+
+                            var symDefault = new SimpleFillSymbol().setColor(new Color([255, 255, 0]));
+                            var cbRenderer = new ClassBreaksRenderer(symDefault, "IMPERV");
+                             cbRenderer.addBreak({
+                                minValue: 0,
+                                maxValue: 20,
+                                symbol: new SimpleFillSymbol().setColor(new Color([0, 0, 255]))
+                            });
+                            cbRenderer.addBreak({
+                                minValue: 10,
+                                maxValue: 40,
+                                symbol: new SimpleFillSymbol().setColor(new Color([0, 127, 0]))
+                            });
+                            cbRenderer.addBreak({
+                                minValue: 40,
+                                maxValue: 60,
+                                symbol: new SimpleFillSymbol().setColor(new Color([255, 255, 0]))
+                            });
+                            cbRenderer.addBreak({
+                                minValue: 60,
+                                maxValue: 80,
+                                symbol: new SimpleFillSymbol().setColor(new Color([255, 127, 0]))
+                            });
+                            cbRenderer.addBreak({
+                                minValue: 80,
+                                maxValue: 100,
+                                symbol: new SimpleFillSymbol().setColor(new Color([255, 0, 0]))
+                            });
+
+                            var arrayLayerDrawingOptions = [];
+                            var layerDrawingOptions = new LayerDrawingOptions();
+                            layerDrawingOptions.renderer = cbRenderer;
+                            arrayLayerDrawingOptions[3] = layerDrawingOptions;
+                            sUrl.setLayerDrawingOptions(arrayLayerDrawingOptions);
+                    });
+                });
+    </script>
+</head>
+<body>
+<div id="MyMapDiv" class="MapClass"></div>
+<button id="btn">渲染</button>
+</body>
+</html>

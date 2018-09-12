@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>SQL表达式</title>
+    <style>
+        html, body, #map {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="arcgis_js/dijit/themes/claro/claro.css" />
+    <link rel="stylesheet" href="arcgis_js/esri/css/esri.css" />
+    <script src="arcgis_js/dojo/dojo.js"></script>
+    <script>
+        var map;
+
+        require(["esri/map",
+            "esri/layers/FeatureLayer","esri/tasks/query",
+            "dojo/domReady!"],
+                function(Map,
+                         FeatureLayer,Query) {
+                    map = new Map("map");
+
+                    var fly=new FeatureLayer("http://123.206.254.127:6080/arcgis/rest/services/hebi_pre_shape_1016/MapServer/2");
+                    map.addLayer(fly);
+
+                    var query=new Query();
+                    query.outFields=["*"];
+                    query.where = "TAG = ''";
+                    fly.queryFeatures(query, function(featureSet) {
+                        console.log(featureSet);
+                    });
+
+
+
+                });
+    </script>
+</head>
+
+<body>
+<div id="map"></div>
+</body>
+</html>

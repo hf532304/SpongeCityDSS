@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=7" />
+    <title>Class Breaks Renderer</title>
+
+<link rel="stylesheet" type="text/css"
+	href="http://localhost:8080/SpongeCityDSS/arcgis_js/dijit/themes/tundra/tundra.css" />
+<script type="text/javascript" 
+	src="http://localhost:8080/SpongeCityDSS/arcgis_js/init.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="http://localhost:8080/SpongeCityDSS/arcgis_js/esri/css/esri.css" />
+
+    <script type="text/javascript" charset="utf-8">
+      dojo.require("esri.map");
+      dojo.require("esri.tasks.query");
+      var map;
+
+      function init() {
+        map = new esri.Map("map");
+      	map.addLayer(new esri.layers.ArcGISDynamicMapServiceLayer("http://123.206.254.127:6080/arcgis/rest/services/Pre_Hebi__30y_24h/MapServer"));
+
+      	var featureLayer = new FeatureLayer(
+                "http://123.206.254.127:6080/arcgis/rest/services/Pre_Hebi__30y_24h/MapServer/2",
+                 {
+                    mode:FeatureLayer.MODE_SNAPSHOT,
+                    outFields: ["*"]
+                 });
+        var lineSymbol_red=new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new dojo.Color("red"), 3);
+        var lineSymbol_yellow=new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new dojo.Color("yellow"), 3);
+        var fill1=new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, null,null);
+        var renderer = new esri.renderer.ClassBreaksRenderer(fill1, "MAXFLOW");
+        renderer.addBreak(0.0001,0.3, new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol_red,null));
+        renderer.addBreak(0.3,10, new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol_yellow,null));
+        featureLayer.setRenderer(renderer);
+        map.addLayer(featureLayer);    
+
+      }
+
+      dojo.addOnLoad(init);
+    </script>
+
+  </head>
+  <body>
+    <div id="map" class="tundra" style="width:800px; height:400px; border:1px solid #000;"></div>
+  </body>
+</html>

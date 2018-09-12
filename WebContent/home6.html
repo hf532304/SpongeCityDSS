@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>UniqueValueRenderer</title>
+    <link  rel="stylesheet"  type="text/css" href="arcgis_js/dijit/themes/tundra/tundra.css"/>
+    <link  rel="stylesheet"  type="text/css" href="arcgis_js/esri/css/esri.css" />
+    <script  type="text/Javascript" src="arcgis_js/init.js"></script>
+    <style type="text/css">
+        .MapClass{
+            width:100%;
+            height:600px;
+            border:1px solid #000;
+        }
+    </style>
+    <script type="text/javascript">
+    var visible = [];
+        require(["esri/map",
+                    "esri/layers/ArcGISDynamicMapServiceLayer",
+                    "dojo/on",
+                    "dojo/dom",
+                    "dojo/colors",
+                    "esri/symbols/SimpleFillSymbol",
+                    "esri/layers/FeatureLayer",
+                    "esri/symbols/SimpleLineSymbol",
+                    "esri/renderers/ClassBreaksRenderer",
+                    "dojo/domReady!"],
+                function (Map, ArcGISDynamicMapServiceLayer,on,dom,Color,SimpleFillSymbol, FeatureLayer, SimpleLineSymbol,ClassBreaksRenderer) {
+                    var map = new esri.Map("MyMapDiv");
+                    var layer = new ArcGISDynamicMapServiceLayer("http://123.206.254.127:6080/arcgis/rest/services/hebi_pre_shape_1016/MapServer", { "id": "mymaplayer" });
+                    layer.setVisibleLayers([3]);
+                    map.addLayer(layer);
+                    //获得id为btn的DOM元素
+                    var btn=dom.byId("btn");
+                    //绑定相应的事件
+                    on(btn,"click",function(){
+                    	  var myInfoTemplate = new esri.InfoTemplate("${NAME}", "${*}");
+                        //定义一个要素图层
+                        var featureLayer = new FeatureLayer(
+                        "http://123.206.254.127:6080/arcgis/rest/services/hebi_pre_shape_1016/MapServer/3",
+                         {
+                            mode:FeatureLayer.MODE_SNAPSHOT,
+                            outFields: ["*"],
+                            infoTemplate: myInfoTemplate
+                         });
+                        //定义线符号
+                        var lineSymbol=new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new dojo.Color("lime"), 1);
+                        //定义面符号
+                        var fill=new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol,new Color("#FFFFCC"));
+                        //定义唯一值渲染器，对字段alias进行渲染，fill是默认的渲染符号
+                        var renderer = new ClassBreaksRenderer(fill, "IMPERV");
+                        //设置渲染间隔
+                        renderer.addBreak(0.0,20.0, new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol,new dojo.Color("blue")));
+                        renderer.addBreak(20.0,40.0, new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol,new dojo.Color("green")));
+                        renderer.addBreak(40.0,60.0,new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol,new dojo.Color("yellow")));
+                        renderer.addBreak(60.0,80.0,new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol,new dojo.Color("orange")));
+                        renderer.addBreak(80.0,Infinity, new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, lineSymbol,new dojo.Color("red")));
+                        
+                        var optionsArray = [];
+                        var drawingOptions = new esri.layers.LayerDrawingOptions();
+                        drawingOptions.renderer = renderer;
+                        optionsArray[3] = drawingOptions;
+                        layer.setLayerDrawingOptions(optionsArray);    
+                        map.getLayer("mymaplayer").setLayerDrawingOptions(optionsArray);
+                        //map.addLayer(layer);                        
+                    
+                    });
+                });
+
+    </script>
+</head>
+<body>
+<div id="MyMapDiv" class="MapClass"></div>
+<button id="btn">渲染</button>
+</body>
+</html>

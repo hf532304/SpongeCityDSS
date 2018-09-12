@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>ArcGis Demo</title>
+<link rel="stylesheet" type="text/css"
+	href="http://localhost:8080/SpongeCityDSS/arcgis_js/dijit/themes/tundra/tundra.css" />
+<script type="text/javascript" 
+	src="http://localhost:8080/SpongeCityDSS/arcgis_js/init.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="http://localhost:8080/SpongeCityDSS/arcgis_js/esri/css/esri.css" />
+
+  <!-- script src="https://js.arcgis.com/3.21/"></script --> 
+<style type="text/css">
+	.MapClass
+	{  width:1254x;
+           height:570px;
+           border:1px solid #000;
+        }
+</style>
+ 
+<script type="text/javascript">
+	require(["esri/map","esri/layers/ArcGISDynamicMapServiceLayer", "dojo/domReady!", "esri/layers/FeatureLayer", "esri/dijit/FeatureTable", "dojo/ready", "esri/InfoTemplate"],
+		function(Map,ArcGISDynamicMapServiceLayer, FeatureLayer, FeatureTable, InfoTemplate,ready){
+	
+		var mapOption = {};
+		mapOption.center = esri.geometry.Point(114.2992, 35.745091);			// 117.1564,39.094
+		//var myMap = new esri.Map("arcgisDiv");
+		var myMap = new esri.Map("arcgisDiv", mapOption);
+		var myTiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://www.arcgisonline.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer");
+		myMap.addLayer(myTiledMapServiceLayer);
+		myMap.setZoom(11);	
+	    	
+	//利用url创建一个动态地图服务对象
+	//var newLayer1=new ArcGISDynamicMapServiceLayer("http://123.206.254.127:6080/arcgis/rest/services/postroad/MapServer");
+  //var newLayer2=new ArcGISDynamicMapServiceLayer("http://123.206.254.127:6080/arcgis/rest/services/Hebi_post_catchment/MapServer");
+	var newLayer3=new ArcGISDynamicMapServiceLayer("http://123.206.254.127:6080/arcgis/rest/services/MyMapService/MapServer");
+	//将地图服务对象添加到地图容器中
+	//myMap.addLayer(newLayer1);      
+  //myMap.addLayer(newLayer2);      
+	myMap.addLayer(newLayer3);   
+	
+    var _junctionsInfoTemplate = new esri.InfoTemplate();
+    _junctionsInfoTemplate.setTitle("<b>FID: ${FID}, NAME: ${NAME}</b>");
+
+    var _conduitsInfoTemplate = new esri.InfoTemplate();
+    _conduitsInfoTemplate.setTitle("<b>FID: ${FID}, NAME: ${NAME}</b>");
+
+    var _subcatchmentsInfoTemplate = new esri.InfoTemplate();
+    _subcatchmentsInfoTemplate.setTitle("<b>FID: ${FID}, NAME: ${NAME}</b>");
+    
+    var _InfoContent =
+      "<div class='demographicInfoContent'>" +
+      "Tag: ${TAG}<br/>" + 
+      "DEPTH: ${DEPTH}<br/>" +  
+      "INVERT ELEV: ${INVERTELEV}<br/>" +
+      "RIM ELEV: ${RIMELEV}<br/>" +
+      "TIMEMAXHGL: ${TIMEMAXHGL}" +
+      "</div>";
+      var _conduitsInfoContent =
+          "<div class='demographicInfoContent'>" +
+          "Tag: ${TAG}<br/>" + 
+          "LENGTH: ${LENGTH}<br/>" +  
+          "SLOPE: ${SLOPE}<br/>" +
+          "MAXFLOW: ${MAXFLOW}<br/>" +
+          "TIMEMAXFLW: ${TIMEMAXFLW}" +
+          "</div>";
+      var _subcatchmentsInfoContent =
+          "<div class='demographicInfoContent'>" +
+          "RAINGAGE: ${RAINGAGE}<br/>" + 
+          "WIDTH: ${WIDTH}<br/>" +  
+          "SLOPE: ${SLOPE}<br/>" +
+          "ROUTING: ${ROUTING}<br/>" +
+          "RUNOFF COEF: ${RUNOFFCOEF}" +
+          "</div>";
+      _junctionsInfoTemplate.setContent("Junctions for:<br>${X} ${Y}<br/>" + _InfoContent);
+      _conduitsInfoTemplate.setContent("Conduits for:<br>${INLETNODE} ${OUTLETNODE}<br/>" + _conduitsInfoContent);
+      _subcatchmentsInfoTemplate.setContent("Subcatchments for:<br>${X} ${Y}<br/>" + _subcatchmentsInfoContent);
+      
+    var demographicsLayerURL = "http://123.206.254.127:6080/arcgis/rest/services/Hebi_post_catchment/MapServer"; 
+    var demographicsLayerOptions = {
+      "id": "demographicsLayer",
+      "opacity": 0.8,
+      "showAttribution": false
+    };
+    var demographicsLayer = new ArcGISDynamicMapServiceLayer(demographicsLayerURL, demographicsLayerOptions);
+    demographicsLayer.setInfoTemplates({
+    	1: { infoTemplate: _junctionsInfoTemplate },
+    	2: { infoTemplate: _conduitsInfoTemplate },     	
+    	3: { infoTemplate: _subcatchmentsInfoTemplate }
+    });
+    demographicsLayer.setVisibleLayers([1,2,3]);
+    myMap.addLayer(demographicsLayer);
+    	
+        
+	});
+	
+</script>
+<style type="text/css">
+.tundra {
+	margin: 0, auto;
+}
+</style>
+</head>
+<body class="tundra">
+	<div id="arcgisDiv" class="MapClass"></div>
+</body>
+</html>

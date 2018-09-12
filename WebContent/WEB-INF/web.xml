@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>SpongeCityDSS</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>/home</welcome-file>
+    <welcome-file>proxy.jsp</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <servlet-name>MyMainServlet</servlet-name>
+    <servlet-class>com.scwe.dss.servlet.MyMainServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MyMainServlet</servlet-name>
+    <url-pattern>/Page</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>AndroidServlet</servlet-name>
+    <servlet-class>com.scwe.dss.servlet.AndroidServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AndroidServlet</servlet-name>
+    <url-pattern>/Android</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>DataTransferServlet</servlet-name>
+    <servlet-class>com.scwe.dss.servlet.DataTransferServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DataTransferServlet</servlet-name>
+    <url-pattern>/data</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>FileUploadServlet</servlet-name>
+    <servlet-class>com.scwe.dss.servlet.FileUploadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FileUploadServlet</servlet-name>
+    <url-pattern>/FileUpload</url-pattern>
+  </servlet-mapping>
+ 
+</web-app>

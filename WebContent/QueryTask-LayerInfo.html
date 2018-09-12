@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=7" />
+    <title>QueryTask with geometry, results as an InfoWindow</title>
+
+    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/1.6/js/dojo/dijit/themes/tundra/tundra.css">
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=1.6"></script>
+      <!-- 
+<link rel="stylesheet" type="text/css" href="arcgis_js/dijit/themes/tundra/tundra.css" />
+<script type="text/javascript" src="arcgis_js/init.js"></script>
+<link rel="stylesheet" type="text/css" href="arcgis_js/esri/css/esri.css" />
+   -->
+  
+    <script type="text/javascript" language="Javascript">
+      dojo.require("esri.map");
+      dojo.require("esri.tasks.query");
+ 
+      var map, queryTask, query;
+      var symbol, infoTemplate;
+ 
+      function init() {
+        //创建地图
+        map = new esri.Map("mapDiv");
+ 
+        //创建并添加动态层
+        var layer = new esri.layers.ArcGISDynamicMapServiceLayer("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer");
+        map.addLayer(layer);
+ 
+        //监听click事件，当用户点击地图时执行executeQueryTask方法
+        dojo.connect(map, "onClick", executeQueryTask);
+ 
+        //建立查询任务
+        queryTask = new esri.tasks.QueryTask("http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer/1");
+ 
+        //监听onComplete事件的处理结果，使用queryTask.execute方法回调
+        //dojo.connect(queryTask, "onComplete", showResults);
+ 
+        //建立查询过滤器
+        query = new esri.tasks.Query();
+        query.returnGeometry = true;
+        query.outFields = ["STATE_NAME",
+        "STATE_FIPS", "STATE_ABBR", "HYPERLINK", "AREA"];
+ 
+        //在信息窗口创建infoTemplate
+        //${属性名}将取代目前的功能和属性值
+        infoTemplate = new esri.InfoTemplate("${STATE_NAME}", "State Fips:${STATE_FIPS}<br />Abbreviation: ${STATE_ABBR}<br />Area: ${AREA}");
+ 
+        symbol = new esri.symbol.SimpleFillSymbol
+       (esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+       new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOT,
+       new dojo.Color([255,0,0]), 2), new dojo.Color([255,255,0,0.5]));
+      }
+ 
+      function executeQueryTask(evt) {
+        //用户点击onClick事件返回地图上EVT点.
+        //包含在MapPoint(esri.geometry.point)和screenPoint(pixel像素点).
+        //设置查询几何等于evt.mapPoint
+        query.geometry = evt.mapPoint;
+ 
+        //执行任务和完成showResults
+        queryTask.execute(query, showResults);
+      }
+ 
+      function showResults(featureSet) {
+        //删除地图上所有的图形层
+        map.graphics.clear();
+ 
+        //QueryTask返回featureSet类型.通过featureSet的循环把他们添加到信息窗口
+        for (var i=0, il=featureSet.features.length; i<il; i++) {
+          //从featureSet中得到当前实例.
+          //从当前实例赋值给graphic
+          var graphic = featureSet.features[0];
+          graphic.setSymbol(symbol);
+ 
+          //设置图形的infoTemplate.
+          graphic.setInfoTemplate(infoTemplate);
+ 
+          //添加当前这个图形到地图图层中
+          map.graphics.add(graphic);
+        }
+      }
+ 
+      dojo.addOnLoad(init);
+    </script>
+  </head>
+  <body class="tundra">
+    Click on a State to get more info.  When State is highlighted, click State again to get infoWindow.
+    <div id="mapDiv" style="width:600px; height:600px; border:1px solid #000;"></div>
+  </body>
+</html>
